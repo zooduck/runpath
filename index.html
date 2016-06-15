@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang='en'>
+<head>
+	<!-- meta -->
+	<meta charset='utf-8' />
+	<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no' />
+	<meta name='author' content='zooduck, wesley pumpkinhead' />
+	<!-- title -->
+	<title>RunPath Test 14-06-2016</title>
+	<!-- style -->
+	<style>
+		*{
+			box-sizing: border-box;
+		}
+		body{
+			margin: 0 auto;
+			text-align: center;
+		}
+		body, input{
+			font: normal 19px calibri, sans-serif;
+		}
+		input{
+			padding: 5px;
+		}
+		input:active, input:focus{
+			outline: solid #ccc;
+		}
+		ul li{
+			list-style-type: none;
+		}
+		.controls{
+			position: fixed;
+			background: #fff;
+			opacity: .9;
+			padding: 15px;
+			width: 100%;
+			cursor: default;			
+		}
+		.pagination{
+			position: fixed;
+			top: 217px;
+			background: #fff;
+			opacity: .9;			
+			min-height: 60px;
+			width: 100%;
+			padding: 10px;
+			cursor: default;	
+			user-select: none;
+			-webkit-user-select: none;
+		}
+		.pagination > div:nth-of-type(1){
+			display: block;
+			padding: 10px 0;
+			background: #eee;
+		}
+		.pagination > div:nth-of-type(2){
+			display: inline-block;
+			margin-top: 10px;
+		}
+		.pagination .tabs{
+			float: left;
+			padding: 5px;
+			color: #555;
+			border: solid 1px #fff;
+		}
+		.pagination .tabs:hover, .pagination .tabs.highlight{
+			color: #000;
+			cursor: pointer;
+			border: solid 1px #ccc;
+			background: #eee;
+		}		
+		header{
+			position: fixed;
+			left: 0px;
+			top: 0px;
+			width: 100%;
+			padding: 10px;
+			background: #000;
+			color: #fff;
+			opacity: .8;
+			transition: all .2s;
+		}
+		header a{
+			color: #fff;
+		}
+		header.malenky{
+			width: auto;			
+			left: 0px;
+			top: 0px;
+			font-size: .7em;
+			opacity: .8;
+			background: #fff;
+			color: #333;			
+		}
+		header.malenky a{
+			color: #333;
+		}
+		content{
+			display: block;
+			margin-top: 150px;
+		}
+		content .photos{
+			display: inline-block;
+			margin-top: 200px;
+		}
+		.reqs-wrapper{
+			position: fixed;
+			right: 0px;
+			top: 150px;
+			width: 500px;
+			perspective: 500px;
+			perspective-origin: 50% 50%;
+			opacity: .9;			
+		}
+		.reqs-wrapper.click-through{
+			pointer-events: none;
+		}
+		#reqs{
+			position: relative;
+			height: 100%;
+			right: 0px;
+			padding: 15px;
+			text-align: justify;
+			background: #fff;
+			border: solid 2px #ddd;
+			border-right-width: 0;
+			transform: rotate3d(0, 1, 0, 90deg);
+			transform-origin: right;
+			transition: all .5s;
+			opacity: .5;
+		}
+		#reqs.show{			
+			transform: rotate3d(0, 1, 0, 0deg);
+			opacity: 1;
+		}
+		#reqs .close{
+			cursor: pointer;
+			font-size: 1.5em;
+			user-select: none;			
+		}
+		#reqs .close:hover > span{
+			opacity: 1;
+		}
+		#reqs .close span{
+			opacity: 0;
+			transition: all .2s;
+		}
+		#scrollstop_filler{
+			display: none;
+			height: 150px;
+			width: 100%;
+		}
+		#scrollstop_filler.show{
+			display: inline-block;
+		}
+	</style>
+	<!--script -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src='app.js'></script>
+</head>
+<body ng-app='RunPath' ng-controller='mainCtrl' max-photos='164' scroll-stopper>	
+	
+	<!-- header -->
+	<header id='title_header'>		
+		<h2>RunPath AngularJS FED Test</h2>
+		<a href='#' show-reqs ng-click='toggle = !toggle'>(<span ng-show='!toggle'>Show</span><span ng-show='toggle'>Hide</span> Requirements)</a>
+	</header>
+
+	<!-- content -->
+	<content>
+	
+		<!-- controls -->
+		<div class='controls' id='controls'>
+			<input type='text' ng-model='titleFilter' placeholder='Search Title...' ng-change='photosFilter()' />
+			<input type='text' ng-model='resultsLimit' placeholder='Results per page...' ng-change='limitTo()' />
+		</div>		
+
+		<!-- pagination -->
+		<div class='pagination' id='pagination'>
+			<div>showing {{filteredPhotos.length}} of {{pagination[currentPage - 1].pages.length}}</div>
+			<div>
+				<div class='tabs' ng-repeat='item in pagination' ng-click='setCurrentPage($index + 1)' ng-class='{"highlight": currentPage == $index + 1}'>
+					<span>{{item.description}}</span>
+				</div>
+			</div>
+		</div>
+
+		<div class='photos'>
+			<div ng-repeat="photo in filteredPhotos">
+				<div id='{{photo.id}}'>
+					<img ng-src='{{photo.thumbnailUrl}}' />
+					<div>
+						<ul>
+							<li>Id: {{photo.id}}</li>
+							<li>Title: {{photo.title}}</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</content>
+
+	<!-- requirements doc -->
+	<div class='reqs-wrapper' ng-class='{"click-through": !toggle}'>
+		<div id='reqs' ng-class='{"show": toggle}'>
+			<div class='close' ng-click='toggle = !toggle'><span>E</span>x<span>it</span></div>
+			<p>
+				Using AngularJS create a single page application that displays a list of recent images with related titles ("thumbnailUrl" and "title") using the following
+				API endpoint:
+			</p>
+			<a href='http://jsonplaceholder.typicode.com/photos' target='_blank'>http://jsonplaceholder.typicode.com/photos</a>
+			<p>
+				The application should also have on the client side a mechanism to allow the user to search by photo title (filter by "title") and limit the number
+				of images shown (previous / next pagination).
+				<br />
+				<s>Basic styling should be achieved with the use of the Bootstrap of Foundation framework.</s>
+				<br />
+				Please send us a link to the github repository containing your code.
+			</p>
+		</div>
+	</div>
+</body>
+</html>
