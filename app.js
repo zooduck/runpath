@@ -106,7 +106,7 @@ angular.module('RunPath.directives', []).directive('scrollStopper', function ( h
 	// ---------------------------------------------------------------------------------------
 	return{
 		link: function ( scope, el, attrs ){
-			var title_header      = document.getElementById('title_header');			 
+			var title_header = document.getElementById('title_header');			 
 			document.addEventListener('scroll', function ( e ) {						
 				if( document.body.scrollTop || document.documentElement.scrollTop > 10 ){
 					helpersService.addClass( title_header, 'malenky' );		
